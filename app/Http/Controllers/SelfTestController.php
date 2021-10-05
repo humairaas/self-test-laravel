@@ -9,31 +9,27 @@ class SelfTestController extends Controller
 {
     function postData(Request $request){
         try{
-            $testData = $request->input("testData");
-            $testData_obj = json_decode($testData);
-            
-            $type = $testData_obj->type;
-            $score = $testData_obj->score;
-            date_default_timezone_set("Asia/Kuala_Lumpur");
-            $date = date("Y-m-d h:i:s");
-            
+            $id = $request->input("result_id");
+
             $request_app = $request->input("request_app");
             $req_app_obj = json_decode($request_app);
 
-            $mentari =  !empty($req_app_obj->mentari) ? $req_app_obj->mentari: 0;
-            $fullName =  $req_app_obj->fullName;
+            $mentari_id =  !empty($req_app_obj->mentari) ? $req_app_obj->mentari: NULL;
+            $nric_type = NULL;
+            $nric_number =  !empty($req_app_obj->nric) ? $req_app_obj->nric: NULL;
+            $nric_number_string = str_replace('-', '', $nric_number);
+            $name =  $req_app_obj->fullName;
+            $telNo =  $req_app_obj->telNum;
+            $address1 =  !empty($req_app_obj->address1) ? $req_app_obj->address1: NULL;
+            $address2 =  !empty($req_app_obj->address2) ? $req_app_obj->address2: NULL;
+            $state =  !empty($req_app_obj->state) ? $req_app_obj->state: NULL;
+            $city =  !empty($req_app_obj->city) ? $req_app_obj->city: NULL;
+            $postcode =  !empty($req_app_obj->postCode) ? $req_app_obj->postCode: NULL;
             $email =  $req_app_obj->email;
-            $nric =  !empty($req_app_obj->nric) ? $req_app_obj->nric: 0;
-            $telNum =  $req_app_obj->telNum;
-            $address1 =  !empty($req_app_obj->address1) ? $req_app_obj->address1: '';
-            $address2 =  !empty($req_app_obj->address2) ? $req_app_obj->address2: '';
-            $postCode =  !empty($req_app_obj->postCode) ? $req_app_obj->postCode: 0;
-            $city =  !empty($req_app_obj->city) ? $req_app_obj->city: '';
-            $state =  !empty($req_app_obj->state) ? $req_app_obj->state: '';
 
-            $data = array('MENTARI_ID' => $mentari,'FULL_NAME' => $fullName, 'EMAIL' => $email, 'NRIC' => $nric, 'TEL_NUM' => $telNum, 'ADD_L1' => $address1, 'ADD_L2' => $address2, 'POST_CODE' => $postCode, 'CITY' => $city, 'STATE' => $state, 'TYPE' => $type,'SCORE' => $score, 'DATE' => $date);
+            $data = array('psychometric_result_id' => $id, 'mentari_id' =>$mentari_id,'nric_type' => $nric_type, 'nric_number' => $nric_number_string, 'name' => $name, 'telno' => $telNo, 'address1' => $address1, 'address2' => $address2, 'state' => $state, 'city' => $city, 'postcode' => $postcode, 'email' => $email);
             
-            $query = DB::table('req_app')->insert($data);
+            $query = DB::table('appointment_selftest')->insert($data);
   
             http_response_code(200);
             return response([
@@ -49,17 +45,16 @@ class SelfTestController extends Controller
     }
     function postTestData(Request $request){
         try{
-            date_default_timezone_set("Asia/Kuala_Lumpur");
-            $date = date("Y-m-d h:i:s");
             $type = $request->input('type');
             $score = $request->input('score');
-
-            $data = array('TYPE' => $type,'SCORE' => $score, 'TEST_DATE' => $date);
-            $query = DB::table('self_test')->insert($data);
   
+            $data = array('psychometric_id' => $type,'psychometric_score' =>$score);
+            $query = DB::table('psychometric_result')-> insertGetId($data);
+
             http_response_code(200);
             return response([
-                'message' => 'Data successfully Created.'
+                'message' => 'Data successfully Created.',
+                'id' => $query
             ]);
         
         }catch (RequestException $r){
@@ -70,14 +65,96 @@ class SelfTestController extends Controller
         }
     }
 
-    function getData(Request $request){
-        return [$request->input('request_app')];
+    function getRange(Request $request){
         try{
+            $type = $request->input('type');
+            $query = DB::table('psychometric_range')
+                        ->select('range_min_value','range_max_value','range_label', 'range_description')
+                        ->where('psychometric_id', $type)
+                        ->get();
+
+            http_response_code(200);
+            return response([
+                'message' => 'Data successfully Created.',
+                'data' => $query
+            ]);
+            
 
         }catch (RequestException $r){
-
+            http_response_code(400);
+            return response([
+                'message' => 'Failed to Create data.'
+            ]);
         }
+    }
 
+    function getState(Request $request){
+        try{
+            $country_id = $request->input('country_id');
+            $query = DB::table('set_state')
+                        ->select('state_id AS id','desc AS name')
+                        ->where('country_id',$country_id)
+                        ->get();
+
+            http_response_code(200);
+            return response([
+                'message' => 'Data successfully Created.',
+                'data' => $query
+            ]);
+            
+
+        }catch (RequestException $r){
+            http_response_code(400);
+            return response([
+                'message' => 'Failed to Create data.'
+            ]);
+        }
+    }
+
+    function getCity(Request $request){
+        try{
+            $state_id = $request->input('state_id');
+            $query = DB::table('set_city')
+                        ->select('city_id AS id','desc AS name')
+                        ->where('state_id',$state_id)
+                        ->get();
+
+            http_response_code(200);
+            return response([
+                'message' => 'Data successfully Created.',
+                'data' => $query
+            ]);
+            
+
+        }catch (RequestException $r){
+            http_response_code(400);
+            return response([
+                'message' => 'Failed to Create data.'
+            ]);
+        }
+    }
+
+    function getPostcode(Request $request){
+        try{
+            $city_id = $request->input('city_id');
+            $query = DB::table('set_postcode')
+                        ->select('postcode_id AS id','desc AS name')
+                        ->where('city_id',$city_id)
+                        ->get();
+
+            http_response_code(200);
+            return response([
+                'message' => 'Data successfully Created.',
+                'data' => $query
+            ]);
+            
+
+        }catch (RequestException $r){
+            http_response_code(400);
+            return response([
+                'message' => 'Failed to Create data.'
+            ]);
+        }
     }
 
     function deleteData(Request $request){
