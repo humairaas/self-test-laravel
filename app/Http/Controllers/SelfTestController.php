@@ -15,12 +15,13 @@ class SelfTestController extends Controller
             $request_app = $request->input("request_app");
             $req_app_obj = json_decode($request_app);
 
-            $mentari_id =  !empty($req_app_obj->mentari) ? $req_app_obj->mentari: NULL;
+            $mentari_id =  !empty($req_app_obj->mentari);
             $nric_type = NULL;
-            $nric_number =  !empty($req_app_obj->nric) ? $req_app_obj->nric: NULL;
+            $nric_number =  !empty($req_app_obj->nric);
             $nric_number_string = str_replace('-', '', $nric_number);
             $name =  $req_app_obj->fullName;
             $telNo =  $req_app_obj->telNum;
+            $telNo_number = str_replace('', '', $telNo);
             $address1 =  !empty($req_app_obj->address1) ? $req_app_obj->address1: NULL;
             $address2 =  !empty($req_app_obj->address2) ? $req_app_obj->address2: NULL;
             $state =  !empty($req_app_obj->state) ? $req_app_obj->state: NULL;
@@ -28,7 +29,7 @@ class SelfTestController extends Controller
             $postcode =  !empty($req_app_obj->postCode) ? $req_app_obj->postCode: NULL;
             $email =  $req_app_obj->email;
 
-            $data = array('psychometric_result_id' => $id, 'mentari_id' =>$mentari_id,'nric_type' => $nric_type, 'nric_number' => $nric_number_string, 'name' => $name, 'telno' => $telNo, 'address1' => $address1, 'address2' => $address2, 'state' => $state, 'city' => $city, 'postcode' => $postcode, 'email' => $email);
+            $data = array('psychometric_result_id' => $id, 'mentari_id' =>$mentari_id,'nric_type' => $nric_type, 'nric_number' => $nric_number_string, 'name' => $name, 'telno' => $telNo_number, 'address1' => $address1, 'address2' => $address2, 'state' => $state, 'city' => $city, 'postcode' => $postcode, 'email' => $email);
 
             $query = DB::table('appointment_selftest')->insert($data);
 
