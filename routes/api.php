@@ -22,8 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['tag' => 'Demo Api'], function(){
     Route::post('post',[SelfTestController::class, 'postData'])->name('Post Data');
     Route::post('postTest',[SelfTestController::class, 'postTestData'])->name('Post Test Data');
-    
-    Route::get('get',[SelfTestController::class, 'getRange'])->name('Get Score Range');
+
+    Route::get('getTestRange',[SelfTestController::class, 'getTestRange'])->name('Get Score Range');
     Route::get('getState',[SelfTestController::class, 'getState'])->name('Get State List');
     Route::get('getCity',[SelfTestController::class, 'getCity'])->name('Get City List');
     Route::get('getPostcode',[SelfTestController::class, 'getPostcode'])->name('Get Postcode List');

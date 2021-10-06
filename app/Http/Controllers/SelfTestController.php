@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Exception\RequestException;
 
 class SelfTestController extends Controller
 {
@@ -28,14 +29,14 @@ class SelfTestController extends Controller
             $email =  $req_app_obj->email;
 
             $data = array('psychometric_result_id' => $id, 'mentari_id' =>$mentari_id,'nric_type' => $nric_type, 'nric_number' => $nric_number_string, 'name' => $name, 'telno' => $telNo, 'address1' => $address1, 'address2' => $address2, 'state' => $state, 'city' => $city, 'postcode' => $postcode, 'email' => $email);
-            
+
             $query = DB::table('appointment_selftest')->insert($data);
-  
+
             http_response_code(200);
             return response([
                 'message' => 'Data successfully Created.'
             ]);
-        
+
         }catch (RequestException $r){
             http_response_code(400);
             return response([
@@ -47,7 +48,7 @@ class SelfTestController extends Controller
         try{
             $type = $request->input('type');
             $score = $request->input('score');
-  
+
             $data = array('psychometric_id' => $type,'psychometric_score' =>$score);
             $query = DB::table('psychometric_result')-> insertGetId($data);
 
@@ -56,7 +57,7 @@ class SelfTestController extends Controller
                 'message' => 'Data successfully Created.',
                 'id' => $query
             ]);
-        
+
         }catch (RequestException $r){
             http_response_code(400);
             return response([
@@ -65,7 +66,7 @@ class SelfTestController extends Controller
         }
     }
 
-    function getRange(Request $request){
+    function getTestRange(Request $request){
         try{
             $type = $request->input('type');
             $query = DB::table('psychometric_range')
@@ -75,10 +76,10 @@ class SelfTestController extends Controller
 
             http_response_code(200);
             return response([
-                'message' => 'Data successfully Created.',
+                'message' => 'Data inserted successfully.',
                 'data' => $query
             ]);
-            
+
 
         }catch (RequestException $r){
             http_response_code(400);
@@ -101,7 +102,7 @@ class SelfTestController extends Controller
                 'message' => 'Data successfully Created.',
                 'data' => $query
             ]);
-            
+
 
         }catch (RequestException $r){
             http_response_code(400);
@@ -124,7 +125,7 @@ class SelfTestController extends Controller
                 'message' => 'Data successfully Created.',
                 'data' => $query
             ]);
-            
+
 
         }catch (RequestException $r){
             http_response_code(400);
@@ -147,7 +148,7 @@ class SelfTestController extends Controller
                 'message' => 'Data successfully Created.',
                 'data' => $query
             ]);
-            
+
 
         }catch (RequestException $r){
             http_response_code(400);
