@@ -70,7 +70,7 @@ class SelfTestController extends Controller
         try{
             $type = $request->input('type');
             $query = DB::table('psychometric_range')
-                        ->select('range_min_value','range_max_value','range_label', 'range_description')
+                        ->select('range_min_value','range_max_value','range_label', 'range_label_bm', 'range_description', 'range_description_bm')
                         ->where('psychometric_id', $type)
                         ->get();
 
